@@ -1,0 +1,8 @@
+<resources>
+    <string-array name="xposedscope" >
+        <!-- 这里填写模块的作用域应用的包名，可以填多个。 -->
+        <item>ceui.lisa.pixiv</item>
+        <item>com.xjs.ehviewer</item>
+        <item>com.picacomic.fregata</item>
+    </string-array>
+</resources>
