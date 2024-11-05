@@ -44,12 +44,12 @@
         app:layout_constraintVertical_bias="0.322" />
 
     <Button
-        android:id="@+id/refreshButton"
+        android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
-        android:text="刷新状态"
+        android:text="启动原神"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/timeSetButton"
         app:layout_constraintTop_toBottomOf="@+id/statusView" />
@@ -62,7 +62,7 @@
         android:layout_marginTop="32dp"
         android:text="设置时间"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/refreshButton"
+        app:layout_constraintEnd_toStartOf="@+id/startButton"
         app:layout_constraintHorizontal_bias="0.232"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/statusView" />

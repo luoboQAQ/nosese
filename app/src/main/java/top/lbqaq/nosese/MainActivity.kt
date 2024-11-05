@@ -3,21 +3,28 @@ package top.lbqaq.nosese
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.content.SharedPreferences
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Calendar
 
+
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         val timeSetButton : Button = findViewById(R.id.timeSetButton)
         val dateSetView : TextView = findViewById(R.id.dateSetView)
         val timeSetView : TextView = findViewById(R.id.timeSetView)
-        val refreshButton : Button = findViewById(R.id.refreshButton)
+        val startButton : Button = findViewById(R.id.startButton)
 
         val formatter : DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
@@ -109,8 +116,13 @@ class MainActivity : AppCompatActivity() {
             refreshUI(sharedPreferences, timeNowView, formatter, statusView)
         }
 
-        refreshButton.setOnClickListener{
-            refreshUI(sharedPreferences, timeNowView, formatter, statusView)
+        startButton.setOnClickListener{
+            val intent : Intent? = packageManager.getLaunchIntentForPackage("com.xjs.ehviewer")
+            if (intent != null) {
+                startActivity(intent)
+            } else {
+                Toast.makeText(this,"未安装应用",Toast.LENGTH_SHORT).show()
+            }
         }
 
         //初始化时间
