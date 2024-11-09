@@ -35,28 +35,28 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val statusView : TextView = findViewById(R.id.statusView)
-        val timeNowView : TextView = findViewById(R.id.timeNowView)
-        val timeSetButton : Button = findViewById(R.id.timeSetButton)
-        val dateSetView : TextView = findViewById(R.id.dateSetView)
-        val timeSetView : TextView = findViewById(R.id.timeSetView)
-        val startButton : Button = findViewById(R.id.startButton)
+        val statusView: TextView = findViewById(R.id.statusView)
+        val timeNowView: TextView = findViewById(R.id.timeNowView)
+        val timeSetButton: Button = findViewById(R.id.timeSetButton)
+        val dateSetView: TextView = findViewById(R.id.dateSetView)
+        val timeSetView: TextView = findViewById(R.id.timeSetView)
+        val startButton: Button = findViewById(R.id.startButton)
 
-        val formatter : DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
         //添加异常捕获，在非框架环境下不闪退
         var normalEnv = false
-        val sharedPreferences : SharedPreferences = try {
+        val sharedPreferences: SharedPreferences = try {
             getSharedPreferences("config", Context.MODE_WORLD_READABLE)
-        } catch (e : SecurityException){
+        } catch (e: SecurityException) {
             normalEnv = true
             getSharedPreferences("normal", Context.MODE_PRIVATE)
         }
         if (normalEnv) {
-            Toast.makeText(this,"非模块环境，仅供调试，设置不会保存",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "非模块环境，仅供调试，设置不会保存", Toast.LENGTH_SHORT).show()
         }
 
-        dateSetView.setOnClickListener{
+        dateSetView.setOnClickListener {
             // 日期选择器
             val ca = Calendar.getInstance()
             var mYear = ca[Calendar.YEAR]
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             datePickerDialog.show()
         }
 
-        timeSetView.setOnClickListener{
+        timeSetView.setOnClickListener {
             // 时间选择器
             val ca = Calendar.getInstance()
             val mHour = ca[Calendar.HOUR_OF_DAY]
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             val timePickerDialog = TimePickerDialog(
                 this,
                 { _, hourOfDay, minute ->
-                    val mTime = "%02d:%02d".format(hourOfDay,minute)
+                    val mTime = "%02d:%02d".format(hourOfDay, minute)
                     timeSetView.text = mTime
                 },
                 mHour, mMinute, true
@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             timePickerDialog.show()
         }
 
-        timeSetButton.setOnClickListener{
+        timeSetButton.setOnClickListener {
             //拼接时间字符串
             val timeString = buildString {
                 append(dateSetView.text)
@@ -104,40 +104,53 @@ class MainActivity : AppCompatActivity() {
                 append(":00")
             }
             try {
-                val time = LocalDateTime.parse(timeString,formatter)
-            } catch (e : DateTimeParseException){
-                Toast.makeText(this,"日期不合法，请从新设置",Toast.LENGTH_SHORT).show()
+                val time = LocalDateTime.parse(timeString, formatter)
+            } catch (e: DateTimeParseException) {
+                Toast.makeText(this, "日期不合法，请从新设置", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             with(sharedPreferences.edit()) {
                 putString("settingDate", timeString)
                 apply() // 使用apply()提交数据
             }
-            refreshUI(sharedPreferences, timeNowView, formatter, statusView)
+            refreshUI(sharedPreferences, timeNowView, formatter, statusView, timeSetButton)
         }
 
-        startButton.setOnClickListener{
-            val intent : Intent? = packageManager.getLaunchIntentForPackage("com.xjs.ehviewer")
+        startButton.setOnClickListener {
+            val intent: Intent? = packageManager.getLaunchIntentForPackage("com.xjs.ehviewer")
             if (intent != null) {
                 startActivity(intent)
             } else {
-                Toast.makeText(this,"未安装应用",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "未安装应用", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        var clickNum = 0
+        statusView.setOnClickListener {
+            //留个解锁的后门
+            clickNum++
+            if (clickNum >= 100) {
+                clickNum = 0
+                timeSetButton.setEnabled(true)
+            }else if (clickNum == 50) {
+                Toast.makeText(this, "确定还要继续吗？", Toast.LENGTH_SHORT).show()
             }
         }
 
         //初始化时间
-        val nowDateTime : LocalDateTime = LocalDateTime.now()
+        val nowDateTime: LocalDateTime = LocalDateTime.now()
         dateSetView.text = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(nowDateTime)
 //        timeSetView.text = DateTimeFormatter.ofPattern("HH:mm").format(nowDateTime)
 
-        refreshUI(sharedPreferences, timeNowView, formatter, statusView)
+        refreshUI(sharedPreferences, timeNowView, formatter, statusView, timeSetButton)
     }
 
     private fun refreshUI(
         sharedPreferences: SharedPreferences,
         timeNowView: TextView,
         formatter: DateTimeFormatter,
-        statusView: TextView
+        statusView: TextView,
+        timeSetButton: Button
     ) {
         val settingDateText = sharedPreferences.getString("settingDate", "-1")
         var settingDate = LocalDateTime.now()
@@ -156,8 +169,10 @@ class MainActivity : AppCompatActivity() {
 
         if (isTimeOk) {
             statusView.text = "已解锁"
+            timeSetButton.setEnabled(true)
         } else {
             statusView.text = "暂未解锁"
+            timeSetButton.setEnabled(false)
         }
     }
 }
